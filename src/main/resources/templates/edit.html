@@ -1,0 +1,17 @@
+<form class="flex w-full" hx-post="/todos/{todo.id}" hx-target="#todo-{todo.id}" hx-swap="outerHTML">
+    <input class="flex-grow p-0.5 ml-2 mr-2 rounded-sm drop-shadow-sm pl-2 outline-offset-2 outline-1 outline-teal-200"
+           onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+           type="text" name="title" autofocus value="{todo.title}">
+    <button type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+             class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/>
+        </svg>
+    </button>
+    <button hx-get="/todos/{todo.id}">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+             class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+</form>

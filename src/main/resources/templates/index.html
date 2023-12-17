@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html class="h-full w-full" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo app</title>
+    <script src="js/htmx.min.js" crossorigin="anonymous"></script>
+    <link href="css/output.css" rel="stylesheet">
+</head>
+<body class="h-full w-full" hx-boost="true">
+<div class="flex flex-col w-full h-full items-center bg-teal-100">
+    <h1 class="text-7xl font-light text-teal-800 m-2 drop-shadow-md">Todos</h1>
+    <form class="flex w-full mb-2 sm:w-1/2" hx-post="/todos" hx-target=".todos" hx-swap="outerHTML"
+          hx-on::after-request="var element = document.getElementById('title'); element.value = ''; element.focus();"
+          hx-push-url="true">
+        <input class="flex-grow ml-2 rounded-sm drop-shadow-md pl-2 outline-offset-2 outline-1 outline-teal-500"
+               id="title" type="text" aria-label="Add todo" name="title" placeholder="What needs to be done?">
+        <button class="bg-teal-600 w-16 p-2 ml-2 mr-2 rounded-md text-neutral-50 drop-shadow-md focus:ring-2 ring-teal-800"
+                type="submit">Add
+        </button>
+    </form>
+    <div id="error" class="text-red-600"></div>
+    {#fragment id = todos}
+        <div class="todos h-full w-full sm:w-1/2">
+        <ul>
+        {#for todo in todos}
+            {#fragment id = todo}
+                <li class="flex justify-between items-center m-2 p-4 rounded-sm drop-shadow-md bg-neutral-50"
+                id="todo-{todo.id}" hx-target="this">
+                <div class="h-7 flex flex-row items-center">
+                    {#if todo.completed}
+                        <span class="mr-2 text-neutral-400">✔</span>
+                        <span class="line-through text-neutral-400">{todo.title}</span>
+                    {#else}
+                        <input type="checkbox" class="mr-2" name="mark" aria-label="Mark complete"
+                               hx-post="/todos/{todo.id}/mark-complete" hx-target="#new-element" hx-swap="beforebegin"
+                               hx-on::after-request="event.detail.successful && document.getElementById('todo-{todo.id}').remove();">
+                        <span>{todo.title}</span>
+                    {/if}
+                </div>
+                <div class="h-7">
+                {#if ! todo.completed}
+                    <button name="edit" hx-get="/todos/{todo.id}/edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor"
+                             class="w-6 h-6 inline-block align-middle">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0
+                      01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"/>
+                        </svg>
+                    </button>
+                {/if}
+                <button name="delete" hx-target="#todo-{todo.id}" hx-swap="outerHTML" hx-delete="/todos/{todo.id}">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="w-6 h-6 inline-block align-middle">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16
+                              19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108
+                              48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5
+                              0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09
+                              2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+                    </svg>
+                </button>
+                </div>
+                </li>
+            {/fragment}
+        {/for}
+        <div id="new-element"></div>
+        </ul>
+        </div>
+    {/fragment}
+</div>
+</body>
+<script>
+    // A quick and dirty way to show errors
+    document.addEventListener('htmx:responseError', function (evt) {
+        document.getElementById('error').innerHTML = evt.detail.error
+        setTimeout(function () {
+            document.getElementById('error').innerHTML = ''
+        }, 3000)
+    });
+</script>
+</html>
+
